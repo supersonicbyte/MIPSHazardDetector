@@ -45,4 +45,9 @@ public class IInstruction extends Instruction {
     public void setImmidiate(String immidiate) {
         this.immidiate = immidiate.toUpperCase();
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " " + getRt()  + " " + getRs() + " " + getImmidiate();
+    }
 }

@@ -36,7 +36,7 @@ public class Instruction {
     @Override
     public String toString() {
         if(label != null){
-            return label + " " + name;
+            return label + ":  " + name;
         }
         return name;
     }

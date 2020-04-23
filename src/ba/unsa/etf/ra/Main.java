@@ -28,7 +28,7 @@ public class Main {
         }
     };
 
-    public static  ArrayList<String> iType=new ArrayList<>(){
+    public static  ArrayList<String> iTypeNoMemory=new ArrayList<>(){
         {
             add("beq");
             add("bne");
@@ -39,6 +39,11 @@ public class Main {
             add("ori");
             add("xori");
             add("lui");
+        }
+    };
+
+    public static ArrayList<String> iTypeMemory=new ArrayList<>(){
+        {
             add("lb");
             add("lh");
             add("lw");
@@ -79,11 +84,30 @@ public class Main {
                         ins = new RInstruction(parameters[0], parameters[1], parameters[2], parameters[3]);
                         instructions.add(ins);
                     }
+                    if(iTypeNoMemory.contains(parameters[0].toLowerCase())){
+                        if(parameters[0].toLowerCase()!="lui"){
+                            ins=new IInstruction(parameters[0], parameters[1], parameters[2], parameters[3]);
+                        }
+                        else{
+                            ins=new IInstruction(parameters[0], parameters[1], "", parameters[2]); //instrukcija lui nema izvorisni registar
+                        }
+                        instructions.add(ins);
+                    }
                 }
                 else{
                     if(rType.contains(parameters[1].toLowerCase())){
                         String label=parameters[0].replace(":","");
                         ins=new RInstruction(label, parameters[1], parameters[2], parameters[3], parameters[4]);
+                        instructions.add(ins);
+                    }
+                    if(iTypeNoMemory.contains(parameters[1].toLowerCase())){
+                        String label=parameters[0].replace(":","");
+                        if(parameters[1].toLowerCase()!="lui"){
+                            ins=new IInstruction(label, parameters[1], parameters[2], parameters[3], parameters[4]);
+                        }
+                        else{
+                            ins=new IInstruction(label, parameters[1], parameters[2], "", parameters[3]); //instrukcija lui nema izvorisni registar
+                        }
                         instructions.add(ins);
                     }
                 }
