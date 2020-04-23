@@ -10,16 +10,16 @@ public class IInstruction extends Instruction {
 
     public IInstruction(String name, String rt, String rs, String immidiate) {
         super(name);
-        this.rt = rt;
-        this.rs = rs;
-        this.immidiate = immidiate;
+        this.rt = rt.toUpperCase();
+        this.rs = rs.toUpperCase();
+        this.immidiate = immidiate.toUpperCase();
     }
 
     public IInstruction(String label, String name, String rt, String rs, String immidiate) {
         super(label, name);
-        this.rt = rt;
-        this.rs = rs;
-        this.immidiate = immidiate;
+        this.rt = rt.toUpperCase();
+        this.rs = rs.toUpperCase();
+        this.immidiate = immidiate.toUpperCase();
     }
 
     public String getRt() {
@@ -27,7 +27,7 @@ public class IInstruction extends Instruction {
     }
 
     public void setRt(String rt) {
-        this.rt = rt;
+        this.rt = rt.toUpperCase();
     }
 
     public String getRs() {
@@ -35,7 +35,7 @@ public class IInstruction extends Instruction {
     }
 
     public void setRs(String rs) {
-        this.rs = rs;
+        this.rs = rs.toUpperCase();
     }
 
     public String getImmidiate() {
@@ -43,6 +43,6 @@ public class IInstruction extends Instruction {
     }
 
     public void setImmidiate(String immidiate) {
-        this.immidiate = immidiate;
+        this.immidiate = immidiate.toUpperCase();
     }
 }

@@ -24,6 +24,27 @@ public class Main {
             add("sub");
             add("subu");
             add("xor");
+            add("mul");
+        }
+    };
+
+    public static  ArrayList<String> iType=new ArrayList<>(){
+        {
+            add("beq");
+            add("bne");
+            add("addi");
+            add("addiu");
+            add("slti");
+            add("andi");
+            add("ori");
+            add("xori");
+            add("lui");
+            add("lb");
+            add("lh");
+            add("lw");
+            add("sb");
+            add("sh");
+            add("sw");
         }
     };
 
@@ -53,9 +74,18 @@ public class Main {
 
             while (line != null) {
                 String[] parameters = line.split(" ");
-                if(rType.contains(parameters[0])){
-                    ins = new RInstruction(parameters[0], parameters[1], parameters[2], parameters[3]);
-                    instructions.add(ins);
+                if(!parameters[0].contains(":")) { //ukoliko prva rijec nema : znaci da nema labele na toj instrukciji
+                    if (rType.contains(parameters[0].toLowerCase())) {
+                        ins = new RInstruction(parameters[0], parameters[1], parameters[2], parameters[3]);
+                        instructions.add(ins);
+                    }
+                }
+                else{
+                    if(rType.contains(parameters[1].toLowerCase())){
+                        String label=parameters[0].replace(":","");
+                        ins=new RInstruction(label, parameters[1], parameters[2], parameters[3], parameters[4]);
+                        instructions.add(ins);
+                    }
                 }
                 line = reader.readLine();
             }

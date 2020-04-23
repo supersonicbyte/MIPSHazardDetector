@@ -7,23 +7,23 @@ public class RInstruction extends Instruction {
 
     public RInstruction(String name, String rd, String rs, String rt) {
         super(name);
-        this.rt = rt;
-        this.rs = rs;
-        this.rd = rd;
+        this.rt = rt.toUpperCase();
+        this.rs = rs.toUpperCase();
+        this.rd = rd.toUpperCase();
     }
 
     public RInstruction(String label, String name, String rd, String rs, String rt) {
         super(label, name);
-        this.rt = rt;
-        this.rs = rs;
-        this.rd = rd;
+        this.rt = rt.toUpperCase();
+        this.rs = rs.toUpperCase();
+        this.rd = rd.toUpperCase();
     }
     public String getRt() {
         return rt;
     }
 
     public void setRt(String rt) {
-        this.rt = rt;
+        this.rt = rt.toUpperCase();
     }
 
     public String getRs() {
@@ -31,7 +31,7 @@ public class RInstruction extends Instruction {
     }
 
     public void setRs(String rs) {
-        this.rs = rs;
+        this.rs = rs.toUpperCase();
     }
 
     public String getRd() {
@@ -39,7 +39,7 @@ public class RInstruction extends Instruction {
     }
 
     public void setRd(String rd) {
-        this.rd = rd;
+        this.rd = rd.toUpperCase();
     }
 
     @Override

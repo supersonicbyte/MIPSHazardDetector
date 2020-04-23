@@ -8,12 +8,13 @@ public class Instruction {
     }
 
     public Instruction(String name) {
-        this.name = name;
+        this.name = name.toUpperCase();
+        this.label=null;
     }
 
     public Instruction(String label, String name) {
         this.label = label;
-        this.name = name;
+        this.name = name.toUpperCase();
     }
 
     public String getLabel() {
