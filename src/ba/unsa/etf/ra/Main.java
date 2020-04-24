@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class Main {
     public static ArrayList<String> rType = new ArrayList<>() {
@@ -28,7 +29,7 @@ public class Main {
         }
     };
 
-    public static  ArrayList<String> iTypeNoMemory=new ArrayList<>(){
+    public static ArrayList<String> iTypeNoMemory = new ArrayList<>() {
         {
             add("beq");
             add("bne");
@@ -42,7 +43,7 @@ public class Main {
         }
     };
 
-    public static ArrayList<String> iTypeMemory=new ArrayList<>(){
+    public static ArrayList<String> iTypeMemory = new ArrayList<>() {
         {
             add("lb");
             add("lh");
@@ -50,6 +51,13 @@ public class Main {
             add("sb");
             add("sh");
             add("sw");
+        }
+    };
+
+    public static ArrayList<String> jType = new ArrayList<>(){
+        {
+            add("jal");
+            add("j");
         }
     };
 
@@ -64,12 +72,12 @@ public class Main {
             file = new File(filePath);
         }
         ArrayList<Instruction> instructions = loadInstructions(file);
-        for(Instruction i: instructions){
+        for (Instruction i : instructions) {
             System.out.println(i);
         }
     }
 
-    public static ArrayList<Instruction> loadInstructions(File file) {
+    public static ArrayList<Instruction> loadInstructions(File file) throws IllegalArgumentException {
         ArrayList<Instruction> instructions = new ArrayList<>();
         BufferedReader reader;
         Instruction ins;
@@ -79,36 +87,58 @@ public class Main {
 
             while (line != null) {
                 String[] parameters = line.split(" ");
-                if(!parameters[0].contains(":")) { //ukoliko prva rijec nema : znaci da nema labele na toj instrukciji
+                if (!parameters[0].contains(":")) {        //ukoliko prva rijec nema : znaci da nema labele na toj instrukciji
                     if (rType.contains(parameters[0].toLowerCase())) {
                         ins = new RInstruction(parameters[0], parameters[1], parameters[2], parameters[3]);
                         instructions.add(ins);
                     }
-                    if(iTypeNoMemory.contains(parameters[0].toLowerCase())){
-                        if(parameters[0].toLowerCase()!="lui"){
-                            ins=new IInstruction(parameters[0], parameters[1], parameters[2], parameters[3]);
-                        }
-                        else{
-                            ins=new IInstruction(parameters[0], parameters[1], "", parameters[2]); //instrukcija lui nema izvorisni registar
+                    else if (iTypeNoMemory.contains(parameters[0].toLowerCase())) {
+                        if (parameters[0].toLowerCase() != "lui") {
+                            ins = new IInstruction(parameters[0], parameters[1], parameters[2], parameters[3]);
+                        } else {
+                            ins = new IInstruction(parameters[0], parameters[1], "", parameters[2]); //instrukcija lui nema izvorisni registar
                         }
                         instructions.add(ins);
                     }
-                }
-                else{
-                    if(rType.contains(parameters[1].toLowerCase())){
-                        String label=parameters[0].replace(":","");
-                        ins=new RInstruction(label, parameters[1], parameters[2], parameters[3], parameters[4]);
+                    else if(jType.contains(parameters[0].toLowerCase())){
+                        ins = new JInstruction(parameters[0], parameters[1]);
                         instructions.add(ins);
                     }
-                    if(iTypeNoMemory.contains(parameters[1].toLowerCase())){
-                        String label=parameters[0].replace(":","");
-                        if(parameters[1].toLowerCase()!="lui"){
-                            ins=new IInstruction(label, parameters[1], parameters[2], parameters[3], parameters[4]);
-                        }
-                        else{
-                            ins=new IInstruction(label, parameters[1], parameters[2], "", parameters[3]); //instrukcija lui nema izvorisni registar
+                    else if(iTypeMemory.contains(parameters[0].toLowerCase())){
+                        ins = new IMemInstruction(parameters[0], parameters[1], parameters[2]);
+                        instructions.add(ins);
+                    }
+                    else{
+                        System.out.println(parameters[0]);
+                        throw new IllegalArgumentException("Neispravan format ulazne datoteke!");
+                    }
+                } else {
+                    if (rType.contains(parameters[1].toLowerCase())) {
+                        String label = parameters[0].replace(":", "");
+                        ins = new RInstruction(label, parameters[1], parameters[2], parameters[3], parameters[4]);
+                        instructions.add(ins);
+                    }
+                    else if (iTypeNoMemory.contains(parameters[1].toLowerCase())) {
+                        String label = parameters[0].replace(":", "");
+                        if (parameters[1].toLowerCase() != "lui") {
+                            ins = new IInstruction(label, parameters[1], parameters[2], parameters[3], parameters[4]);
+                        } else {
+                            ins = new IInstruction(label, parameters[1], parameters[2], "", parameters[3]); //instrukcija lui nema izvorisni registar
                         }
                         instructions.add(ins);
+                    }
+                    else if(jType.contains(parameters[1].toLowerCase())){
+                        ins = new JInstruction(parameters[0], parameters[1], parameters[2]);
+                        instructions.add(ins);
+                    }
+                    else if(iTypeMemory.contains(parameters[1].toLowerCase())){
+                        String label = parameters[0].replace(":", "");
+                        ins = new IMemInstruction(label, parameters[1], parameters[2], parameters[3]);
+                        instructions.add(ins);
+                    }
+                    else{
+                        for(int i = 0; i < parameters.length; ++i) System.out.println(parameters[i]);
+                        throw new IllegalArgumentException("Neispravan format ulazne datoteke!");
                     }
                 }
                 line = reader.readLine();

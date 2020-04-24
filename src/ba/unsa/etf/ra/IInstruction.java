@@ -12,14 +12,14 @@ public class IInstruction extends Instruction {
         super(name);
         this.rt = rt.toUpperCase();
         this.rs = rs.toUpperCase();
-        this.immidiate = immidiate.toUpperCase();
+        this.immidiate = immidiate;
     }
 
     public IInstruction(String label, String name, String rt, String rs, String immidiate) {
         super(label, name);
         this.rt = rt.toUpperCase();
         this.rs = rs.toUpperCase();
-        this.immidiate = immidiate.toUpperCase();
+        this.immidiate = immidiate;
     }
 
     public String getRt() {
