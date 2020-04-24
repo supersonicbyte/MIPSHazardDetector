@@ -1,6 +1,8 @@
 package ba.unsa.etf.ra;
 
-public class Instruction {
+import java.io.Serializable;
+
+public class Instruction implements Serializable {
     private String label;
     private String name;
 

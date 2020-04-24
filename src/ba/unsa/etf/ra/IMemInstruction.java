@@ -1,6 +1,8 @@
 package ba.unsa.etf.ra;
 
-public class IMemInstruction extends Instruction {
+import java.io.Serializable;
+
+public class IMemInstruction extends Instruction implements Serializable {
     private String rt;
     private String immAndRs;
 

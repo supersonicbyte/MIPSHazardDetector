@@ -1,9 +1,6 @@
 package ba.unsa.etf.ra;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -54,7 +51,7 @@ public class Main {
         }
     };
 
-    public static ArrayList<String> jType = new ArrayList<>(){
+    public static ArrayList<String> jType = new ArrayList<>() {
         {
             add("jal");
             add("j");
@@ -75,6 +72,7 @@ public class Main {
         for (Instruction i : instructions) {
             System.out.println(i);
         }
+        writeInscructions(instructions, filePath);
     }
 
     public static ArrayList<Instruction> loadInstructions(File file) throws IllegalArgumentException {
@@ -91,24 +89,20 @@ public class Main {
                     if (rType.contains(parameters[0].toLowerCase())) {
                         ins = new RInstruction(parameters[0], parameters[1], parameters[2], parameters[3]);
                         instructions.add(ins);
-                    }
-                    else if (iTypeNoMemory.contains(parameters[0].toLowerCase())) {
+                    } else if (iTypeNoMemory.contains(parameters[0].toLowerCase())) {
                         if (parameters[0].toLowerCase() != "lui") {
                             ins = new IInstruction(parameters[0], parameters[1], parameters[2], parameters[3]);
                         } else {
                             ins = new IInstruction(parameters[0], parameters[1], "", parameters[2]); //instrukcija lui nema izvorisni registar
                         }
                         instructions.add(ins);
-                    }
-                    else if(jType.contains(parameters[0].toLowerCase())){
+                    } else if (jType.contains(parameters[0].toLowerCase())) {
                         ins = new JInstruction(parameters[0], parameters[1]);
                         instructions.add(ins);
-                    }
-                    else if(iTypeMemory.contains(parameters[0].toLowerCase())){
+                    } else if (iTypeMemory.contains(parameters[0].toLowerCase())) {
                         ins = new IMemInstruction(parameters[0], parameters[1], parameters[2]);
                         instructions.add(ins);
-                    }
-                    else{
+                    } else {
                         System.out.println(parameters[0]);
                         throw new IllegalArgumentException("Neispravan format ulazne datoteke!");
                     }
@@ -117,8 +111,7 @@ public class Main {
                         String label = parameters[0].replace(":", "");
                         ins = new RInstruction(label, parameters[1], parameters[2], parameters[3], parameters[4]);
                         instructions.add(ins);
-                    }
-                    else if (iTypeNoMemory.contains(parameters[1].toLowerCase())) {
+                    } else if (iTypeNoMemory.contains(parameters[1].toLowerCase())) {
                         String label = parameters[0].replace(":", "");
                         if (parameters[1].toLowerCase() != "lui") {
                             ins = new IInstruction(label, parameters[1], parameters[2], parameters[3], parameters[4]);
@@ -126,18 +119,15 @@ public class Main {
                             ins = new IInstruction(label, parameters[1], parameters[2], "", parameters[3]); //instrukcija lui nema izvorisni registar
                         }
                         instructions.add(ins);
-                    }
-                    else if(jType.contains(parameters[1].toLowerCase())){
+                    } else if (jType.contains(parameters[1].toLowerCase())) {
                         ins = new JInstruction(parameters[0], parameters[1], parameters[2]);
                         instructions.add(ins);
-                    }
-                    else if(iTypeMemory.contains(parameters[1].toLowerCase())){
+                    } else if (iTypeMemory.contains(parameters[1].toLowerCase())) {
                         String label = parameters[0].replace(":", "");
                         ins = new IMemInstruction(label, parameters[1], parameters[2], parameters[3]);
                         instructions.add(ins);
-                    }
-                    else{
-                        for(int i = 0; i < parameters.length; ++i) System.out.println(parameters[i]);
+                    } else {
+                        for (int i = 0; i < parameters.length; ++i) System.out.println(parameters[i]);
                         throw new IllegalArgumentException("Neispravan format ulazne datoteke!");
                     }
                 }
@@ -150,5 +140,19 @@ public class Main {
             return null;
         }
         return instructions;
+    }
+
+    public static void writeInscructions(ArrayList<Instruction> instructionList, String filePath) {
+        if (instructionList != null && !instructionList.isEmpty()) {
+            PrintWriter pw = null;
+            try {
+                pw = new PrintWriter(new FileOutputStream("output.txt"));
+                for (Instruction i : instructionList)
+                    pw.println(i);
+                pw.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

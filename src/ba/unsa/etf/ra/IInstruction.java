@@ -1,6 +1,8 @@
 package ba.unsa.etf.ra;
 
-public class IInstruction extends Instruction {
+import java.io.Serializable;
+
+public class IInstruction extends Instruction implements Serializable {
     private String rt;
     private String rs;
     private String immidiate;

@@ -1,6 +1,9 @@
 package ba.unsa.etf.ra;
 
-public class RInstruction extends Instruction {
+import java.awt.*;
+import java.io.Serializable;
+
+public class RInstruction extends Instruction implements Serializable {
     private String rt;
     private String rs;
     private String rd;

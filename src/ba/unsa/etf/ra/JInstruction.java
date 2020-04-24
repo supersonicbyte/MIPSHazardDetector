@@ -1,6 +1,8 @@
 package ba.unsa.etf.ra;
 
-public class JInstruction extends Instruction{
+import java.io.Serializable;
+
+public class JInstruction extends Instruction implements Serializable {
     private String adress;
 
     public JInstruction(String name, String adress) {
