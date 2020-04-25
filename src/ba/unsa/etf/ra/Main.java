@@ -2,6 +2,7 @@ package ba.unsa.etf.ra;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -70,7 +71,18 @@ public class Main {
             file = new File(filePath);
         }
         ArrayList<Instruction> instructions = loadInstructions(file);
-        for (Instruction i : instructions) {
+        /*for (Instruction i : instructions) {
+            System.out.println(i);
+        }*/
+        for(int i = 0; i < instructions.size(); i++) {
+            if(instructions.get(i).getName().toLowerCase().equals("beq") || instructions.get(i).getName().toLowerCase().equals("bne")) {
+                instructions.add(new RInstruction("ADD", "R31", "R30", "R29"));
+                for(int j = i+1; j < instructions.size(); j++) {
+                    Collections.swap(instructions, instructions.size()-1, j);
+                }
+            }
+        }
+        for(Instruction i : instructions) {
             System.out.println(i);
         }
         writeInscructions(instructions, filePath);
