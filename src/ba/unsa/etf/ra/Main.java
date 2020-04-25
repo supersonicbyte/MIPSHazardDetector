@@ -60,7 +60,7 @@ public class Main {
     };
 
     public static void main(String[] args) {
-        System.out.println("Unesite apslolutnu putanju do .txt datoteke: ");
+        System.out.println("Unesite apsolutnu putanju do .txt datoteke (npr. C:\\Users\\USERNAME\\Desktop\\xyz.txt\\): ");
         Scanner input = new Scanner(System.in);
         String filePath = input.nextLine();
         File file = new File(filePath);
