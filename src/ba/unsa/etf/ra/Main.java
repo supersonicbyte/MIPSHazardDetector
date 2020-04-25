@@ -55,6 +55,7 @@ public class Main {
         {
             add("jal");
             add("j");
+            add("jr");
         }
     };
 
