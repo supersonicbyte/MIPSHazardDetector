@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MIPSHazardDetector:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/MIPSHazardDetector_jar</output-path>
+    <root id="archive" name="MIPSHazardDetector.jar">
+      <element id="module-output" name="MIPSHazardDetector" />
+    </root>
+  </artifact>
+</component>
