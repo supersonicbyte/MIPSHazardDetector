@@ -130,7 +130,12 @@ public class MIPSDelayedBranchDetector {
                 if (target.dajOdredisni().equals(((IInstruction) instr).getRs())) {
                     return false;
                 }
-            } else continue; //j tip ne utice
+            } else if(instr instanceof IMemInstruction){
+                if(target.dajOdredisni().equals(((IMemInstruction) instr).getRs())){
+                    return false;
+                }
+            }
+            else continue; //j tip ne utice
         }
         return true;
     }
@@ -149,6 +154,10 @@ public class MIPSDelayedBranchDetector {
                 }
             } else if (afterTarget instanceof IInstruction) {
                 if (next.dajOdredisni().equals(((IInstruction) afterTarget).getRs())) {
+                    return false;
+                }
+            } else if(afterTarget instanceof IMemInstruction){
+                if(next.dajOdredisni().equals(((IMemInstruction) afterTarget).getRs())){
                     return false;
                 }
             }
