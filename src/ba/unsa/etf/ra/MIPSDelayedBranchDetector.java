@@ -78,8 +78,7 @@ public class MIPSDelayedBranchDetector {
             instructions = loadInstructions(file);
         }
         catch (Exception e){
-            e.printStackTrace();
-            //System.out.println(e.getMessage());
+            System.out.println(e.getMessage());
             return;
         }
         // mapiramo label - redni broj instrukcije u datoteci
@@ -152,7 +151,8 @@ public class MIPSDelayedBranchDetector {
                 if (next.dajOdredisni().equals(((IInstruction) afterTarget).getRs())) {
                     return false;
                 }
-            } else continue; //j tip ne utice
+            }
+            else continue; //j tip ne utice
         }
         return true;
     }
@@ -167,6 +167,11 @@ public class MIPSDelayedBranchDetector {
             IInstruction i1 = (IInstruction) ins1;
             IInstruction i2 = (IInstruction) ins2;
             if (!i1.getRt().equals(i2.getRs()) && !i1.getRt().equals(i2.getRt())) return true;
+        }
+        if(ins1 instanceof IMemInstruction){
+            IMemInstruction imem = (IMemInstruction) ins1;
+            IInstruction iins = (IInstruction) ins2;
+            if (!imem.getRt().equals(iins.getRs()) && !imem.getRt().equals(iins.getRt())) return true;
         }
         return false;
     }
