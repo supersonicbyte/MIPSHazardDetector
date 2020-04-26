@@ -76,9 +76,33 @@ public class Main {
         }*/
         for(int i = 0; i < instructions.size(); i++) {
             if(instructions.get(i).getName().toLowerCase().equals("beq") || instructions.get(i).getName().toLowerCase().equals("bne")) {
-                instructions.add(new RInstruction("ADD", "R31", "R30", "R29"));
-                for(int j = i+1; j < instructions.size(); j++) {
-                    Collections.swap(instructions, instructions.size()-1, j);
+                IInstruction current = (IInstruction) instructions.get(i);
+                if(instructions.get(i-1) instanceof RInstruction) {
+                    RInstruction inst = (RInstruction) instructions.get(i-1);
+                    if(inst.getRd().contains("r0") || inst.getRd().contains("R0")) {
+                        Collections.swap(instructions, i, i-1);
+                    }
+                    else if(!inst.getRd().contains(current.getRt()) && !inst.getRd().contains(current.getRs())) {
+                        Collections.swap(instructions, i, i-1);
+                    } else {
+                        instructions.add(new RInstruction("ADD", "R0", "R0", "R0"));
+                        for(int j = i+1; j < instructions.size(); j++) {
+                            Collections.swap(instructions, instructions.size()-1, j);
+                        }
+                    }
+                } else if(instructions.get(i-1) instanceof IInstruction) {
+                    IInstruction inst = (IInstruction) instructions.get(i-1);
+                    if(inst.getRt().contains("r0") || inst.getRt().contains("R0")) {
+                        Collections.swap(instructions, i, i-1);
+                    }
+                    else if(!inst.getRt().contains(current.getRt()) && !inst.getRt().contains(current.getRs())) {
+                        Collections.swap(instructions, i, i-1);
+                    } else {
+                        instructions.add(new RInstruction("ADD", "R0", "R0", "R0"));
+                        for(int j = i+1; j < instructions.size(); j++) {
+                            Collections.swap(instructions, instructions.size()-1, j);
+                        }
+                    }
                 }
             }
         }
