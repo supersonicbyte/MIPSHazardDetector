@@ -2,7 +2,7 @@ package ba.unsa.etf.ra;
 
 import java.io.Serializable;
 
-public class Instruction implements Serializable {
+public abstract class Instruction implements Serializable {
     private String label;
     private String name;
 
@@ -34,6 +34,8 @@ public class Instruction implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
+    public abstract String dajOdredisni();
 
     @Override
     public String toString() {

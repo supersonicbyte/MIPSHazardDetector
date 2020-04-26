@@ -61,6 +61,7 @@ public class Main {
         }
     };
 
+    public static HashMap<String, Integer> adressMap = new HashMap<>();
 
     public static void main(String[] args) {
         System.out.println("Unesite apsolutnu putanju do .txt datoteke (npr. C:\\Users\\USERNAME\\Desktop\\xyz.txt\\): ");
@@ -74,7 +75,6 @@ public class Main {
         }
         ArrayList<Instruction> instructions = loadInstructions(file);
         // mapiramo label - redni broj instrukcije u datoteci
-        HashMap<String, Integer> adressMap = new HashMap<>();
         for (int i = 0; i < instructions.size(); ++i) {
             if (instructions.get(i).getLabel() != null && instructions.get(i).getLabel() != "") {
                 adressMap.put(instructions.get(i).getLabel().trim(), i);
@@ -83,17 +83,19 @@ public class Main {
         ArrayList<Instruction> outputList = new ArrayList<>();
         for (int i = 0; i < instructions.size(); ++i) {
             if (instructions.get(i).getName().equals("BEQ") || instructions.get(i).getName().equals("BNE")) {
-                if(i >= 1 && validateIndependent(instructions.get(i - 1), instructions.get(i))){
-                outputList.add(instructions.get(i - 1));
-                }
-                else if(i < instructions.size() - 1 && validateNext(instructions.get(i), instructions.get(i + 1))){
-                outputList.add(instructions.get(i + 1));
-                }
-                else{
+                if (i >= 1 && validateIndependent(instructions.get(i - 1), instructions.get(i))) {
+                    outputList.add(instructions.get(i));
+                    outputList.add(instructions.get(i - 1));
+                } else if (i < instructions.size() - 1 && validateNext(instructions.get(i), instructions.get(i + 1), instructions)) {
+                    outputList.add(instructions.get(i));
+                    outputList.add(instructions.get(i + 1));
+                } else {
                     IInstruction ins = (IInstruction) instructions.get(i);
                     Integer index = adressMap.get(ins.getImmidiate().trim());
-                    System.out.println(index);
-                    if(validateTarget(instructions.get(i), instructions.get(index))) outputList.add(instructions.get(index));
+                    if (validateTarget(instructions.get(i), instructions.get(index))) {
+                        outputList.add(instructions.get(i));
+                        outputList.add(instructions.get(index));
+                    }
                 }
             }
 
@@ -105,34 +107,33 @@ public class Main {
     }
 
     private static boolean validateTarget(Instruction branch, Instruction target) {
-        if(!target.getName().equals("BEQ") && !target.getName().equals("BNE")) return true;
+        if (!target.getName().equals("BEQ") && !target.getName().equals("BNE")) return true;
         return false;
     }
 
-    private static boolean validateNext(Instruction ins1, Instruction ins2) {
-        if(ins2 instanceof RInstruction){
-            RInstruction rins = (RInstruction) ins2;
-            IInstruction iins = (IInstruction) ins1;
-            if(!rins.getRd().equals(iins.getRs()) && !rins.getRd().equals(iins.getRt())) return true;
+    private static boolean validateNext(Instruction branch, Instruction next, ArrayList<Instruction> instructions) {
+        if (next instanceof IInstruction && (next.getName().equals("BEQ") || !next.getName().equals("BNE"))) {
+            return false;
         }
-        if(ins2 instanceof IInstruction && !ins2.getName().equals("BEQ") && !ins2.getName().equals("BNE")){
-            IInstruction i1 = (IInstruction) ins2;
-            IInstruction i2 = (IInstruction) ins1;
-            if(!i1.getRt().equals(i2.getRs()) && !i1.getRt().equals(i2.getRt())) return true;
+        if(next instanceof JInstruction ) return false;
+        IInstruction ibr = (IInstruction) branch;
+        Integer index = adressMap.get(ibr.getImmidiate());
+        for(int i = index; i < instructions.size(); ++i){
+
         }
-        return false;
+
     }
 
     private static boolean validateIndependent(Instruction ins1, Instruction ins2) {
-        if(ins1 instanceof RInstruction){
+        if (ins1 instanceof RInstruction) {
             RInstruction rins = (RInstruction) ins1;
             IInstruction iins = (IInstruction) ins2;
-            if(!rins.getRd().equals(iins.getRs()) && !rins.getRd().equals(iins.getRt())) return true;
+            if (!rins.getRd().equals(iins.getRs()) && !rins.getRd().equals(iins.getRt())) return true;
         }
-        if(ins1 instanceof IInstruction && !ins1.getName().equals("BEQ") && !ins1.getName().equals("BNE")){
-          IInstruction i1 = (IInstruction) ins1;
-          IInstruction i2 = (IInstruction) ins2;
-          if(!i1.getRt().equals(i2.getRs()) && !i1.getRt().equals(i2.getRt())) return true;
+        if (ins1 instanceof IInstruction && !ins1.getName().equals("BEQ") && !ins1.getName().equals("BNE")) {
+            IInstruction i1 = (IInstruction) ins1;
+            IInstruction i2 = (IInstruction) ins2;
+            if (!i1.getRt().equals(i2.getRs()) && !i1.getRt().equals(i2.getRt())) return true;
         }
         return false;
     }
@@ -209,8 +210,21 @@ public class Main {
             PrintWriter pw = null;
             try {
                 pw = new PrintWriter(new FileOutputStream("output.txt"));
-                for (Instruction i : instructionList)
-                    pw.println(i);
+                pw.println("Instrukcije zadrške su ispisane u sljedećem formatu \n branch instrukcija - njena instrukcija zadrške: \n ");
+                for(int i = 0; i < instructionList.size(); i += 2){
+                    pw.print(instructionList.get(i));
+                    pw.print("- ");
+                    pw.println(instructionList.get(i + 1));
+                }
+                pw.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            PrintWriter pw = null;
+            try {
+                pw = new PrintWriter(new FileOutputStream("output.txt"));
+                pw.println("Za datu sekvencu instrukcija nije moguce pronaci instrukciju zadrske ili ona nije potrebna");
                 pw.close();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

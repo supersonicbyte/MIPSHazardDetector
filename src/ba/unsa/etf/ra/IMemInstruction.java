@@ -61,6 +61,12 @@ public class IMemInstruction extends Instruction implements Serializable {
     }
 
     @Override
+    public String dajOdredisni() {
+        if(getName().contains("L")) return rt;
+        return null;
+    }
+
+    @Override
     public String toString() {
         return super.toString() + " " + rt + " " + immAndRs;
     }

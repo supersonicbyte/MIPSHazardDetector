@@ -46,6 +46,11 @@ public class RInstruction extends Instruction implements Serializable {
     }
 
     @Override
+    public String dajOdredisni() {
+        return rd;
+    }
+
+    @Override
     public String toString() {
         return super.toString() + " " + getRd()  + " " + getRs() + " " + getRt();
     }

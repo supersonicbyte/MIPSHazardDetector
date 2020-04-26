@@ -49,6 +49,11 @@ public class IInstruction extends Instruction implements Serializable {
     }
 
     @Override
+    public String dajOdredisni() {
+        return rt;
+    }
+
+    @Override
     public String toString() {
         return super.toString() + " " + getRt()  + " " + getRs() + " " + getImmidiate();
     }
