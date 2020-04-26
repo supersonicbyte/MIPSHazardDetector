@@ -14,6 +14,11 @@ public class JInstruction extends Instruction implements Serializable {
         this.adress = adress.toUpperCase();
     }
 
+    @Override
+    public String dajOdredisni() {
+        return null;
+    }
+
     public String getAdress() {
         return adress;
     }

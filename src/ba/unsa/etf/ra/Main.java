@@ -86,13 +86,13 @@ public class Main {
                 if (i >= 1 && validateIndependent(instructions.get(i - 1), instructions.get(i))) {
                     outputList.add(instructions.get(i));
                     outputList.add(instructions.get(i - 1));
-                } else if (i < instructions.size() - 1 && validateNext(instructions.get(i), instructions.get(i + 1), instructions)) {
+                } else if (i < instructions.size() - 1 && validateNext((IInstruction)instructions.get(i), instructions.get(i + 1), instructions)) {
                     outputList.add(instructions.get(i));
                     outputList.add(instructions.get(i + 1));
                 } else {
                     IInstruction ins = (IInstruction) instructions.get(i);
                     Integer index = adressMap.get(ins.getImmidiate().trim());
-                    if (validateTarget(instructions.get(i), instructions.get(index))) {
+                    if (validateTarget((IInstruction)instructions.get(i), instructions.get(index), instructions)) {
                         outputList.add(instructions.get(i));
                         outputList.add(instructions.get(index));
                     }
@@ -106,22 +106,51 @@ public class Main {
         writeInscructions(outputList, filePath);
     }
 
-    private static boolean validateTarget(Instruction branch, Instruction target) {
-        if (!target.getName().equals("BEQ") && !target.getName().equals("BNE")) return true;
-        return false;
+    private static boolean validateTarget(IInstruction branch, Instruction target, ArrayList<Instruction> instructions) {
+        if (target.getName().equals("BEQ") || target.getName().equals("BNE")){
+            return false;
+        }
+        if(target instanceof JInstruction) return false;
+        Integer index = adressMap.get(branch.getImmidiate());
+        Integer nextIndex=instructions.indexOf(branch)+1;
+        for(int i=nextIndex; i<index;i++){
+            Instruction instr=instructions.get(i);
+            if(instr instanceof RInstruction){
+                if(target.dajOdredisni().equals(((RInstruction) instr).getRs()) || target.dajOdredisni().equals(((RInstruction) instr).getRt())){
+                    return false;
+                }
+            }
+            else if(instr instanceof IInstruction){
+                if(target.dajOdredisni().equals(((IInstruction) instr).getRs())){
+                    return false;
+                }
+            }
+            else continue; //j tip ne utice
+        }
+        return true;
     }
 
-    private static boolean validateNext(Instruction branch, Instruction next, ArrayList<Instruction> instructions) {
+    private static boolean validateNext(IInstruction branch, Instruction next, ArrayList<Instruction> instructions) {
         if (next instanceof IInstruction && (next.getName().equals("BEQ") || !next.getName().equals("BNE"))) {
             return false;
         }
         if(next instanceof JInstruction ) return false;
-        IInstruction ibr = (IInstruction) branch;
-        Integer index = adressMap.get(ibr.getImmidiate());
-        for(int i = index; i < instructions.size(); ++i){
-
+        Integer index = adressMap.get(branch.getImmidiate());
+        for(int i = index; i < instructions.size(); i++){
+            Instruction afterTarget=instructions.get(i);
+            if(afterTarget instanceof RInstruction){
+                if(next.dajOdredisni().equals(((RInstruction) afterTarget).getRs()) || next.dajOdredisni().equals(((RInstruction) afterTarget).getRt())){
+                    return false;
+                }
+            }
+            else if(afterTarget instanceof IInstruction){
+                if(next.dajOdredisni().equals(((IInstruction) afterTarget).getRs())){
+                    return false;
+                }
+            }
+            else continue; //j tip ne utice
         }
-
+        return true;
     }
 
     private static boolean validateIndependent(Instruction ins1, Instruction ins2) {
