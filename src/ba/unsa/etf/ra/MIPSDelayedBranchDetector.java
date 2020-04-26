@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-public class Main {
+public class MIPSDelayedBranchDetector {
     public static ArrayList<String> rType = new ArrayList<>() {
         {
             add("add");
