@@ -107,6 +107,7 @@ public class MIPSDelayedBranchDetector {
             }
 
         }
+        System.out.println("Unijeli ste sekvencu: ");
         for (Instruction i : instructions) {
             System.out.println(i);
         }
@@ -277,5 +278,6 @@ public class MIPSDelayedBranchDetector {
                 e.printStackTrace();
             }
         }
+        System.out.println("Izlazna datoteka je generisana pod nazivom output.txt");
     }
 }
