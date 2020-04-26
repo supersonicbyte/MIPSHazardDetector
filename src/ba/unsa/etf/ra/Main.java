@@ -3,6 +3,7 @@ package ba.unsa.etf.ra;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -60,6 +61,7 @@ public class Main {
         }
     };
 
+
     public static void main(String[] args) {
         System.out.println("Unesite apsolutnu putanju do .txt datoteke (npr. C:\\Users\\USERNAME\\Desktop\\xyz.txt\\): ");
         Scanner input = new Scanner(System.in);
@@ -71,45 +73,68 @@ public class Main {
             file = new File(filePath);
         }
         ArrayList<Instruction> instructions = loadInstructions(file);
-        /*for (Instruction i : instructions) {
-            System.out.println(i);
-        }*/
-        for(int i = 0; i < instructions.size(); i++) {
-            if(instructions.get(i).getName().toLowerCase().equals("beq") || instructions.get(i).getName().toLowerCase().equals("bne")) {
-                IInstruction current = (IInstruction) instructions.get(i);
-                if(instructions.get(i-1) instanceof RInstruction) {
-                    RInstruction inst = (RInstruction) instructions.get(i-1);
-                    if(inst.getRd().contains("r0") || inst.getRd().contains("R0")) {
-                        Collections.swap(instructions, i, i-1);
-                    }
-                    else if(!inst.getRd().contains(current.getRt()) && !inst.getRd().contains(current.getRs())) {
-                        Collections.swap(instructions, i, i-1);
-                    } else {
-                        instructions.add(new RInstruction("ADD", "R0", "R0", "R0"));
-                        for(int j = i+1; j < instructions.size(); j++) {
-                            Collections.swap(instructions, instructions.size()-1, j);
-                        }
-                    }
-                } else if(instructions.get(i-1) instanceof IInstruction) {
-                    IInstruction inst = (IInstruction) instructions.get(i-1);
-                    if(inst.getRt().contains("r0") || inst.getRt().contains("R0")) {
-                        Collections.swap(instructions, i, i-1);
-                    }
-                    else if(!inst.getRt().contains(current.getRt()) && !inst.getRt().contains(current.getRs())) {
-                        Collections.swap(instructions, i, i-1);
-                    } else {
-                        instructions.add(new RInstruction("ADD", "R0", "R0", "R0"));
-                        for(int j = i+1; j < instructions.size(); j++) {
-                            Collections.swap(instructions, instructions.size()-1, j);
-                        }
-                    }
-                }
+        // mapiramo label - redni broj instrukcije u datoteci
+        HashMap<String, Integer> adressMap = new HashMap<>();
+        for (int i = 0; i < instructions.size(); ++i) {
+            if (instructions.get(i).getLabel() != null && instructions.get(i).getLabel() != "") {
+                adressMap.put(instructions.get(i).getLabel().trim(), i);
             }
         }
-        for(Instruction i : instructions) {
+        ArrayList<Instruction> outputList = new ArrayList<>();
+        for (int i = 0; i < instructions.size(); ++i) {
+            if (instructions.get(i).getName().equals("BEQ") || instructions.get(i).getName().equals("BNE")) {
+                if(i >= 1 && validateIndependent(instructions.get(i - 1), instructions.get(i))){
+                outputList.add(instructions.get(i - 1));
+                }
+                else if(i < instructions.size() - 1 && validateNext(instructions.get(i), instructions.get(i + 1))){
+                outputList.add(instructions.get(i + 1));
+                }
+                else{
+                    IInstruction ins = (IInstruction) instructions.get(i);
+                    Integer index = adressMap.get(ins.getImmidiate().trim());
+                    System.out.println(index);
+                    if(validateTarget(instructions.get(i), instructions.get(index))) outputList.add(instructions.get(index));
+                }
+            }
+
+        }
+        for (Instruction i : instructions) {
             System.out.println(i);
         }
-        writeInscructions(instructions, filePath);
+        writeInscructions(outputList, filePath);
+    }
+
+    private static boolean validateTarget(Instruction branch, Instruction target) {
+        if(!target.getName().equals("BEQ") && !target.getName().equals("BNE")) return true;
+        return false;
+    }
+
+    private static boolean validateNext(Instruction ins1, Instruction ins2) {
+        if(ins2 instanceof RInstruction){
+            RInstruction rins = (RInstruction) ins2;
+            IInstruction iins = (IInstruction) ins1;
+            if(!rins.getRd().equals(iins.getRs()) && !rins.getRd().equals(iins.getRt())) return true;
+        }
+        if(ins2 instanceof IInstruction && !ins2.getName().equals("BEQ") && !ins2.getName().equals("BNE")){
+            IInstruction i1 = (IInstruction) ins2;
+            IInstruction i2 = (IInstruction) ins1;
+            if(!i1.getRt().equals(i2.getRs()) && !i1.getRt().equals(i2.getRt())) return true;
+        }
+        return false;
+    }
+
+    private static boolean validateIndependent(Instruction ins1, Instruction ins2) {
+        if(ins1 instanceof RInstruction){
+            RInstruction rins = (RInstruction) ins1;
+            IInstruction iins = (IInstruction) ins2;
+            if(!rins.getRd().equals(iins.getRs()) && !rins.getRd().equals(iins.getRt())) return true;
+        }
+        if(ins1 instanceof IInstruction && !ins1.getName().equals("BEQ") && !ins1.getName().equals("BNE")){
+          IInstruction i1 = (IInstruction) ins1;
+          IInstruction i2 = (IInstruction) ins2;
+          if(!i1.getRt().equals(i2.getRs()) && !i1.getRt().equals(i2.getRt())) return true;
+        }
+        return false;
     }
 
     public static ArrayList<Instruction> loadInstructions(File file) throws IllegalArgumentException {
