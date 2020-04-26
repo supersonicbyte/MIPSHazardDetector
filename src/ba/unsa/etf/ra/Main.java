@@ -73,7 +73,14 @@ public class Main {
             filePath = input.nextLine();
             file = new File(filePath);
         }
-        ArrayList<Instruction> instructions = loadInstructions(file);
+        ArrayList<Instruction> instructions;
+        try {
+            instructions = loadInstructions(file);
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            return;
+        }
         // mapiramo label - redni broj instrukcije u datoteci
         for (int i = 0; i < instructions.size(); ++i) {
             if (instructions.get(i).getLabel() != null && instructions.get(i).getLabel() != "") {
@@ -86,13 +93,13 @@ public class Main {
                 if (i >= 1 && validateIndependent(instructions.get(i - 1), instructions.get(i))) {
                     outputList.add(instructions.get(i));
                     outputList.add(instructions.get(i - 1));
-                } else if (i < instructions.size() - 1 && validateNext((IInstruction)instructions.get(i), instructions.get(i + 1), instructions)) {
+                } else if (i < instructions.size() - 1 && validateNext((IInstruction) instructions.get(i), instructions.get(i + 1), instructions)) {
                     outputList.add(instructions.get(i));
                     outputList.add(instructions.get(i + 1));
                 } else {
                     IInstruction ins = (IInstruction) instructions.get(i);
                     Integer index = adressMap.get(ins.getImmidiate().trim());
-                    if (validateTarget((IInstruction)instructions.get(i), instructions.get(index), instructions)) {
+                    if (validateTarget((IInstruction) instructions.get(i), instructions.get(index), instructions)) {
                         outputList.add(instructions.get(i));
                         outputList.add(instructions.get(index));
                     }
@@ -107,25 +114,23 @@ public class Main {
     }
 
     private static boolean validateTarget(IInstruction branch, Instruction target, ArrayList<Instruction> instructions) {
-        if (target.getName().equals("BEQ") || target.getName().equals("BNE")){
+        if (target.getName().equals("BEQ") || target.getName().equals("BNE")) {
             return false;
         }
-        if(target instanceof JInstruction) return false;
-        Integer index = adressMap.get(branch.getImmidiate());
-        Integer nextIndex=instructions.indexOf(branch)+1;
-        for(int i=nextIndex; i<index;i++){
-            Instruction instr=instructions.get(i);
-            if(instr instanceof RInstruction){
-                if(target.dajOdredisni().equals(((RInstruction) instr).getRs()) || target.dajOdredisni().equals(((RInstruction) instr).getRt())){
+        if (target instanceof JInstruction) return false;
+        Integer index = adressMap.get(branch.getImmidiate().trim());
+        Integer nextIndex = instructions.indexOf(branch) + 1;
+        for (int i = nextIndex; i < index; i++) {
+            Instruction instr = instructions.get(i);
+            if (instr instanceof RInstruction) {
+                if (target.dajOdredisni().equals(((RInstruction) instr).getRs()) || target.dajOdredisni().equals(((RInstruction) instr).getRt())) {
                     return false;
                 }
-            }
-            else if(instr instanceof IInstruction){
-                if(target.dajOdredisni().equals(((IInstruction) instr).getRs())){
+            } else if (instr instanceof IInstruction) {
+                if (target.dajOdredisni().equals(((IInstruction) instr).getRs())) {
                     return false;
                 }
-            }
-            else continue; //j tip ne utice
+            } else continue; //j tip ne utice
         }
         return true;
     }
@@ -134,21 +139,19 @@ public class Main {
         if (next instanceof IInstruction && (next.getName().equals("BEQ") || !next.getName().equals("BNE"))) {
             return false;
         }
-        if(next instanceof JInstruction ) return false;
-        Integer index = adressMap.get(branch.getImmidiate());
-        for(int i = index; i < instructions.size(); i++){
-            Instruction afterTarget=instructions.get(i);
-            if(afterTarget instanceof RInstruction){
-                if(next.dajOdredisni().equals(((RInstruction) afterTarget).getRs()) || next.dajOdredisni().equals(((RInstruction) afterTarget).getRt())){
+        if (next instanceof JInstruction) return false;
+        Integer index = adressMap.get(branch.getImmidiate().trim());
+        for (int i = index; i < instructions.size(); i++) {
+            Instruction afterTarget = instructions.get(i);
+            if (afterTarget instanceof RInstruction) {
+                if (next.dajOdredisni().equals(((RInstruction) afterTarget).getRs()) || next.dajOdredisni().equals(((RInstruction) afterTarget).getRt())) {
                     return false;
                 }
-            }
-            else if(afterTarget instanceof IInstruction){
-                if(next.dajOdredisni().equals(((IInstruction) afterTarget).getRs())){
+            } else if (afterTarget instanceof IInstruction) {
+                if (next.dajOdredisni().equals(((IInstruction) afterTarget).getRs())) {
                     return false;
                 }
-            }
-            else continue; //j tip ne utice
+            } else continue; //j tip ne utice
         }
         return true;
     }
@@ -167,16 +170,17 @@ public class Main {
         return false;
     }
 
-    public static ArrayList<Instruction> loadInstructions(File file) throws IllegalArgumentException {
+    public static ArrayList<Instruction> loadInstructions(File file) throws Exception {
         ArrayList<Instruction> instructions = new ArrayList<>();
         BufferedReader reader;
         Instruction ins;
         try {
             reader = new BufferedReader(new FileReader(file));
-            String line = reader.readLine();
+            String line = reader.readLine().replaceAll("\\s+", " "); // regex da izbriše viška whitespace
 
             while (line != null) {
                 String[] parameters = line.split(" ");
+                for(String s: parameters) if(s.equals("") || s.equals(" ")) throw new Exception("Neispravan format ulazne datoteke");
                 if (!parameters[0].contains(":")) {        //ukoliko prva rijec nema : znaci da nema labele na toj instrukciji
                     if (rType.contains(parameters[0].toLowerCase())) {
                         ins = new RInstruction(parameters[0], parameters[1], parameters[2], parameters[3]);
@@ -229,7 +233,6 @@ public class Main {
 
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
         return instructions;
     }
@@ -240,7 +243,7 @@ public class Main {
             try {
                 pw = new PrintWriter(new FileOutputStream("output.txt"));
                 pw.println("Instrukcije zadrške su ispisane u sljedećem formatu \n branch instrukcija - njena instrukcija zadrške: \n ");
-                for(int i = 0; i < instructionList.size(); i += 2){
+                for (int i = 0; i < instructionList.size(); i += 2) {
                     pw.print(instructionList.get(i));
                     pw.print("- ");
                     pw.println(instructionList.get(i + 1));
