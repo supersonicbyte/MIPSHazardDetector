@@ -78,7 +78,8 @@ public class MIPSDelayedBranchDetector {
             instructions = loadInstructions(file);
         }
         catch (Exception e){
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+            //System.out.println(e.getMessage());
             return;
         }
         // mapiramo label - redni broj instrukcije u datoteci
